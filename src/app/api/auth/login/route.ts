@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json();
 
     // Configured admin credentials (reads from .env or defaults)
-    const expectedAdminEmail = (process.env.ADMIN_EMAIL || 'admin@novasystems.io').trim().toLowerCase();
+    const expectedAdminEmail = (process.env.ADMIN_EMAIL || 'willja960@gmail.com').trim().toLowerCase();
     const expectedAdminPassword = process.env.ADMIN_PASSWORD || 'NovaEnterprise2026!';
 
     const cleanInputEmail = (email || '').trim().toLowerCase();
