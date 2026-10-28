@@ -9,7 +9,7 @@ interface AdminLoginProps {
 
 export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   const [step, setStep] = useState<'credentials' | '2fa'>('credentials');
-  const [email, setEmail] = useState('admin@novasystems.io');
+  const [email, setEmail] = useState('willja960@gmail.com');
   const [password, setPassword] = useState('NovaEnterprise2026!');
   const [totpCode, setTotpCode] = useState('');
   const [tempToken, setTempToken] = useState('');

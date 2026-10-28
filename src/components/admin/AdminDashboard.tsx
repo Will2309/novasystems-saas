@@ -27,6 +27,7 @@ import { MetricsOverview } from './MetricsOverview';
 import { LeadsManager } from './LeadsManager';
 import { SystemModal } from './SystemModal';
 import { TeamMemberModal } from './TeamMemberModal';
+import { UsersManager } from './UsersManager';
 
 interface AdminDashboardProps {
   admin: { name: string; role: string; email: string };
@@ -45,7 +46,7 @@ interface AdminDashboardProps {
   onSaveSettings: (updates: Partial<PlatformSettings>) => Promise<void>;
 }
 
-type TabType = 'systems' | 'team' | 'leads' | 'metrics' | 'settings';
+type TabType = 'systems' | 'team' | 'leads' | 'metrics' | 'users' | 'settings';
 
 export function AdminDashboard({
   admin,
@@ -244,6 +245,18 @@ export function AdminDashboard({
             >
               <BarChart3 className="w-4 h-4" />
               Métricas
+            </button>
+
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'users'
+                  ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <UserCheck className="w-4 h-4" />
+              Usuarios & Accesos
             </button>
 
             <button
@@ -462,7 +475,10 @@ export function AdminDashboard({
         {/* Tab 4: Metrics */}
         {activeTab === 'metrics' && <MetricsOverview metrics={metrics} />}
 
-        {/* Tab 5: Branding & Company Customization */}
+        {/* Tab 5: Multi-User Admin Access Management */}
+        {activeTab === 'users' && <UsersManager />}
+
+        {/* Tab 6: Branding & Company Customization */}
         {activeTab === 'settings' && (
           <div className="max-w-3xl rounded-3xl glass-panel-elevated p-6 sm:p-8 space-y-6">
             

@@ -89,6 +89,17 @@ export interface LeadInquiry {
   createdAt: string;
 }
 
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'SuperAdmin' | 'Admin' | 'Ventas' | 'Soporte';
+  password?: string;
+  active: boolean;
+  createdAt: string;
+  lastLogin?: string;
+}
+
 export interface AdminMetrics {
   totalSystems: number;
   totalLeads: number;

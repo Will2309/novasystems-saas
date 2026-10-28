@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { OtpService } from '@/services/otpService';
+import { AuthUsersService } from '@/services/authUsersService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,34 +18,41 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password } = await request.json();
-
-    // Configured admin credentials (reads from .env or defaults)
-    const expectedAdminEmail = (process.env.ADMIN_EMAIL || 'willja960@gmail.com').trim().toLowerCase();
-    const expectedAdminPassword = process.env.ADMIN_PASSWORD || 'NovaEnterprise2026!';
-
     const cleanInputEmail = (email || '').trim().toLowerCase();
 
-    if (cleanInputEmail === expectedAdminEmail && password === expectedAdminPassword) {
-      // Step 1 Success: Generate OTP and send strictly to the email inbox
+    // 1. Authenticate against registered multi-user administrative accounts
+    const authenticatedUser = await AuthUsersService.authenticate(cleanInputEmail, password);
+
+    // 2. Also support direct fallback from environment variables
+    const expectedEnvEmail = (process.env.ADMIN_EMAIL || 'willja960@gmail.com').trim().toLowerCase();
+    const expectedEnvPassword = process.env.ADMIN_PASSWORD || 'NovaEnterprise2026!';
+
+    const isEnvAdmin = cleanInputEmail === expectedEnvEmail && password === expectedEnvPassword;
+
+    if (authenticatedUser || isEnvAdmin) {
+      const targetEmail = authenticatedUser ? authenticatedUser.email : cleanInputEmail;
+
+      // Step 1 Success: Generate OTP and send strictly to that specific user's email inbox
       const { tempToken, maskedEmail, emailSent } = await OtpService.generateAndSendOTP(
-        cleanInputEmail,
+        targetEmail,
         userAgent,
         ip
       );
 
-      // SECURITY RULE: Never return the OTP code in the network/JSON response
       return NextResponse.json({
         success: true,
         requires2FA: true,
         tempToken,
         maskedEmail,
         emailSent,
+        userRole: authenticatedUser?.role || 'SuperAdmin',
+        userName: authenticatedUser?.name || 'Will (SuperAdmin)',
         message: `Código de seguridad confidencial enviado a ${maskedEmail}. Válido por 10 minutos.`,
       });
     }
 
     return NextResponse.json(
-      { success: false, error: 'Credenciales administrativas incorrectas' },
+      { success: false, error: 'Credenciales administrativas incorrectas o cuenta inactiva' },
       { status: 401 }
     );
   } catch (error) {
