@@ -1,6 +1,7 @@
 import { LeadInquiry, AdminMetrics } from '@/types';
 import { INITIAL_LEADS } from '@/lib/mock-data';
 import { SystemsService } from './systemsService';
+import { EmailService } from '@/lib/email';
 
 let leadsStore: LeadInquiry[] = [...INITIAL_LEADS];
 
@@ -18,7 +19,17 @@ export const LeadsService = {
     };
     leadsStore.unshift(newLead);
 
-    // Simulate Webhook dispatch to Telegram / Email in production
+    // 1. Send Real Email Alert to Admin
+    EmailService.sendLeadAdminAlert(newLead).catch((err) => {
+      console.error('[LeadsService] Error enviando alerta al Admin:', err);
+    });
+
+    // 2. Send Real Email Confirmation to Client
+    EmailService.sendLeadClientConfirmation(newLead).catch((err) => {
+      console.error('[LeadsService] Error enviando confirmación al Cliente:', err);
+    });
+
+    // 3. Optional Telegram Webhook
     this.dispatchTelegramNotification(newLead).catch(console.error);
 
     return newLead;
@@ -59,8 +70,6 @@ export const LeadsService = {
   },
 
   async dispatchTelegramNotification(lead: LeadInquiry): Promise<void> {
-    // In production, this dispatches to https://api.telegram.org/bot<TOKEN>/sendMessage
-    // or an SMTP provider like Resend / SendGrid
     if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
       try {
         const text = `🚀 *Nuevo Lead Recibido - NovaSystems Pro*\n\n` +

@@ -4,7 +4,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Shield, Lock, Terminal, Code2 } from 'lucide-react';
 
-export function Footer() {
+interface FooterProps {
+  companyName?: string;
+  logoUrl?: string;
+}
+
+export function Footer({ companyName = 'NovaSystems', logoUrl = '' }: FooterProps) {
   return (
     <footer className="bg-[#050a12] border-t border-slate-800 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -14,11 +19,20 @@ export function Footer() {
           {/* Brand Info */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
-                <Shield className="w-4 h-4" />
-              </div>
-              <span className="font-extrabold text-base text-white tracking-tight">
-                NOVA<span className="text-sky-400">SYSTEMS</span>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={logoUrl}
+                  alt={companyName}
+                  className="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-slate-700 p-0.5"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
+                  <Shield className="w-4 h-4" />
+                </div>
+              )}
+              <span className="font-extrabold text-base text-white tracking-tight uppercase">
+                {companyName}
               </span>
             </div>
             <p className="text-slate-400 text-xs leading-relaxed">
@@ -72,7 +86,7 @@ export function Footer() {
               </p>
               <Link
                 href="/admin"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold hover:bg-sky-500/30 transition-all"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-semibold hover:bg-sky-500/30 transition-all cursor-pointer"
               >
                 <Terminal className="w-3.5 h-3.5" />
                 <span>Ingresar a /admin</span>
@@ -85,7 +99,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-slate-800/80 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
           <div>
-            © {new Date().getFullYear()} NovaSystems Enterprise Inc. Todos los derechos reservados.
+            © {new Date().getFullYear()} {companyName} Enterprise Inc. Todos los derechos reservados.
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1">

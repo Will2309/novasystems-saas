@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { SoftwareSystem, IndustryCategory, CurrencyCode } from '@/types';
+import { SoftwareSystem, IndustryCategory, CurrencyCode, TeamMember, PlatformSettings } from '@/types';
 import { Navbar } from '@/components/landing/Navbar';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { SystemsCatalog } from '@/components/landing/SystemsCatalog';
@@ -10,10 +10,18 @@ import { ContactSection } from '@/components/landing/ContactSection';
 import { Footer } from '@/components/landing/Footer';
 import { LiveDemoModal } from '@/components/landing/LiveDemoModal';
 import { INITIAL_SYSTEMS } from '@/lib/mock-data';
+import { INITIAL_TEAM_MEMBERS } from '@/services/teamService';
 
 export default function HomePage() {
   const [systems, setSystems] = useState<SoftwareSystem[]>(INITIAL_SYSTEMS);
-  const [currency, setCurrency] = useState<CurrencyCode>('USD');
+  const [team, setTeam] = useState<TeamMember[]>(INITIAL_TEAM_MEMBERS);
+  const [settings, setSettings] = useState<PlatformSettings>({
+    currency: 'USD',
+    companyName: 'NovaSystems',
+    companyTagline: 'Software Preconstruido',
+    logoUrl: '',
+    updatedAt: new Date().toISOString(),
+  });
   const [selectedCategory, setSelectedCategory] = useState<IndustryCategory>('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -21,24 +29,30 @@ export default function HomePage() {
   const [activeDemoSystem, setActiveDemoSystem] = useState<SoftwareSystem | null>(null);
   const [quoteTargetSystem, setQuoteTargetSystem] = useState<SoftwareSystem | null>(null);
 
-  // Fetch latest systems & settings on mount
+  // Fetch latest systems, team & settings on mount
   useEffect(() => {
     async function loadData() {
       try {
-        const [sysRes, settingsRes] = await Promise.all([
+        const [sysRes, teamRes, settingsRes] = await Promise.all([
           fetch('/api/systems'),
+          fetch('/api/team'),
           fetch('/api/settings'),
         ]);
 
         const sysData = await sysRes.json();
+        const teamData = await teamRes.json();
         const settingsData = await settingsRes.json();
 
         if (sysData.success && Array.isArray(sysData.data)) {
           setSystems(sysData.data);
         }
 
-        if (settingsData.success && settingsData.data?.currency) {
-          setCurrency(settingsData.data.currency);
+        if (teamData.success && Array.isArray(teamData.data)) {
+          setTeam(teamData.data);
+        }
+
+        if (settingsData.success && settingsData.data) {
+          setSettings(settingsData.data);
         }
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -98,10 +112,18 @@ export default function HomePage() {
     }
   };
 
+  const handleCurrencyChange = (newCurr: CurrencyCode) => {
+    setSettings((prev) => ({ ...prev, currency: newCurr }));
+  };
+
   return (
     <div className="min-h-screen bg-[#070d17] text-slate-100 flex flex-col selection:bg-sky-500 selection:text-white">
-      {/* Navigation */}
-      <Navbar />
+      {/* Navigation (Dynamic Company Name & Logo from Admin) */}
+      <Navbar
+        companyName={settings.companyName}
+        companyTagline={settings.companyTagline}
+        logoUrl={settings.logoUrl}
+      />
 
       <main className="flex-1">
         {/* Hero with live metrics and industry filters */}
@@ -115,14 +137,14 @@ export default function HomePage() {
         {/* Dynamic Catalog with Currency Selector */}
         <SystemsCatalog
           systems={filteredSystems}
-          currency={currency}
-          onCurrencyChange={setCurrency}
+          currency={settings.currency}
+          onCurrencyChange={handleCurrencyChange}
           onOpenDemo={handleOpenDemo}
           onRequestQuote={handleRequestQuote}
         />
 
-        {/* Dev & QA Dual Architecture Section with Interactive Team Profiles & Dynamic Hover Counters */}
-        <DevQaSection />
+        {/* Dev & QA Dual Architecture Section with Dynamic Team Profiles from Admin */}
+        <DevQaSection team={team} />
 
         {/* Contact, Dynamic WhatsApp & FAQs */}
         <ContactSection
@@ -131,8 +153,11 @@ export default function HomePage() {
         />
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer (Dynamic Company Name & Logo from Admin) */}
+      <Footer
+        companyName={settings.companyName}
+        logoUrl={settings.logoUrl}
+      />
 
       {/* Live Interactive Sandbox Demo Modal */}
       {activeDemoSystem && (

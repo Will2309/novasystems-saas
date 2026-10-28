@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { SettingsService } from '@/services/settingsService';
-import { CurrencyCode } from '@/types';
+import { CurrencyCode, PlatformSettings } from '@/types';
+import { sanitizeString } from '@/lib/sanitize';
 
 export async function GET() {
   try {
@@ -15,17 +16,32 @@ export async function GET() {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { currency } = body;
+    const updates: Partial<PlatformSettings> = {};
 
-    const validCurrencies: CurrencyCode[] = ['USD', 'EUR', 'MXN', 'PEN', 'COP'];
-    if (!currency || !validCurrencies.includes(currency)) {
-      return NextResponse.json(
-        { success: false, error: 'Moneda no soportada. Use USD, EUR, MXN, PEN o COP.' },
-        { status: 400 }
-      );
+    if (body.currency) {
+      const validCurrencies: CurrencyCode[] = ['USD', 'EUR', 'MXN', 'PEN', 'COP'];
+      if (!validCurrencies.includes(body.currency)) {
+        return NextResponse.json(
+          { success: false, error: 'Moneda no soportada. Use USD, EUR, MXN, PEN o COP.' },
+          { status: 400 }
+        );
+      }
+      updates.currency = body.currency;
     }
 
-    const updated = await SettingsService.updateCurrency(currency);
+    if (typeof body.companyName === 'string') {
+      updates.companyName = sanitizeString(body.companyName) || 'NovaSystems';
+    }
+
+    if (typeof body.companyTagline === 'string') {
+      updates.companyTagline = sanitizeString(body.companyTagline);
+    }
+
+    if (typeof body.logoUrl === 'string') {
+      updates.logoUrl = body.logoUrl.trim();
+    }
+
+    const updated = await SettingsService.updateSettings(updates);
     return NextResponse.json({ success: true, data: updated });
   } catch (error) {
     console.error('[API Settings PATCH Error]:', error);

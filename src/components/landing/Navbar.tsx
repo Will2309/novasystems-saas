@@ -5,7 +5,17 @@ import Link from 'next/link';
 import { Shield, Terminal, MessageSquare, Menu, X, Lock } from 'lucide-react';
 import { buildWhatsAppLink } from '@/lib/utils';
 
-export function Navbar() {
+interface NavbarProps {
+  companyName?: string;
+  companyTagline?: string;
+  logoUrl?: string;
+}
+
+export function Navbar({
+  companyName = 'NovaSystems',
+  companyTagline = 'Software Preconstruido',
+  logoUrl = '',
+}: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -13,17 +23,26 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
           
-          {/* Brand Logo */}
+          {/* Brand Logo & Name (Dynamically customized from Admin) */}
           <Link href="/" className="flex items-center gap-3 shrink-0 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-700 p-0.5 shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full bg-[#070d17] rounded-[10px] flex items-center justify-center">
-                <Shield className="w-5 h-5 text-sky-400" />
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={companyName}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain bg-slate-900 border border-slate-700 p-0.5 shadow-md group-hover:scale-105 transition-transform"
+              />
+            ) : (
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-sky-400 to-blue-700 p-0.5 shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+                <div className="w-full h-full bg-[#070d17] rounded-[10px] flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-sky-400" />
+                </div>
               </div>
-            </div>
+            )}
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-sky-300 transition-colors">
-                  NOVA<span className="text-sky-400">SYSTEMS</span>
+                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-sky-300 transition-colors uppercase">
+                  {companyName}
                 </span>
                 <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hidden sm:inline-flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -31,18 +50,18 @@ export function Navbar() {
                 </span>
               </div>
               <p className="text-[10px] text-slate-400 tracking-wide hidden lg:block">
-                Software Preconstruido
+                {companyTagline}
               </p>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links (Single-word, whitespace-nowrap, never breaking) */}
+          {/* Desktop Navigation Links */}
           <div className="hidden xl:flex items-center gap-6 2xl:gap-8">
             <a href="#catalogo" className="text-sm font-medium text-slate-300 hover:text-sky-400 transition-colors whitespace-nowrap">
               Catálogo
             </a>
             <a href="#dev-qa" className="text-sm font-medium text-slate-300 hover:text-sky-400 transition-colors whitespace-nowrap">
-              Arquitectura Dev & QA
+              Equipo Dev & QA
             </a>
             <a href="#garantia" className="text-sm font-medium text-slate-300 hover:text-sky-400 transition-colors whitespace-nowrap">
               Seguridad & SLA
@@ -56,7 +75,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-3 shrink-0">
             <Link
               href="/admin"
-              className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-sky-500/40 transition-all whitespace-nowrap"
+              className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800/80 border border-slate-700 hover:border-sky-500/40 transition-all whitespace-nowrap cursor-pointer"
             >
               <Lock className="w-3.5 h-3.5 text-sky-400" />
               <span>Acceso Admin</span>
@@ -81,7 +100,7 @@ export function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Hamburger Button (shown below xl so nothing ever collides) */}
+          {/* Mobile Hamburger Button */}
           <div className="xl:hidden flex items-center gap-2">
             <a
               href="#catalogo"
@@ -116,7 +135,7 @@ export function Navbar() {
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 text-sm font-semibold text-slate-200 hover:text-sky-400 border-b border-slate-800"
           >
-            Arquitectura Dev & QA
+            Equipo Dev & QA
           </a>
           <a
             href="#garantia"

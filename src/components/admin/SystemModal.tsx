@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, UploadCloud, Check, Sparkles } from 'lucide-react';
+import { X, Plus, Sparkles, Check } from 'lucide-react';
 import { SoftwareSystem, IndustryCategory, LicenseType } from '@/types';
 
 interface SystemModalProps {
@@ -128,27 +128,27 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-[#09111e] border border-sky-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn">
+      <div className="relative w-full max-w-2xl max-h-[88vh] flex flex-col rounded-3xl bg-[#09111e] border border-sky-500/30 shadow-2xl overflow-hidden">
         
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
+        {/* Fixed Header (Never clipped) */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 shrink-0 bg-slate-900/70">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-sky-400" />
-            <h3 className="text-lg font-bold text-white">
+            <h3 className="text-base sm:text-lg font-bold text-white">
               {system ? 'Editar Sistema de Software' : 'Publicar Nuevo Sistema en el Catálogo'}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white"
+            className="p-1.5 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Scrollable Form Body (Cero desbordamiento) */}
+        <form id="system-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
           
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -172,7 +172,7 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as IndustryCategory)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
@@ -208,12 +208,12 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
                   required
                   value={priceUSD}
                   onChange={(e) => setPriceUSD(Number(e.target.value))}
-                  className="w-1/3 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono"
+                  className="w-1/3 px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-mono"
                 />
                 <select
                   value={licenseType}
                   onChange={(e) => setLicenseType(e.target.value as LicenseType)}
-                  className="w-2/3 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                  className="w-2/3 px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
                 >
                   <option value="Llave en Mano (Código Fuente)">Llave en Mano (Código)</option>
                   <option value="Licencia Perpetua">Licencia Perpetua</option>
@@ -259,7 +259,7 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
               <button
                 type="button"
                 onClick={handleAddTech}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center gap-1"
+                className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" /> Añadir
               </button>
@@ -269,13 +269,13 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
               {techStack.map((t) => (
                 <span
                   key={t}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-950/60 text-sky-300 border border-sky-500/30 text-xs font-mono"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-950/60 text-sky-300 border border-sky-500/30 text-xs font-mono"
                 >
                   {t}
                   <button
                     type="button"
                     onClick={() => handleRemoveTech(t)}
-                    className="hover:text-rose-400"
+                    className="hover:text-rose-400 ml-1"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -297,7 +297,7 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
                     key={mod}
                     type="button"
                     onClick={() => handleToggleModule(mod)}
-                    className={`flex items-center gap-2 p-2 rounded-lg text-left text-xs transition-colors ${
+                    className={`flex items-center gap-2 p-2 rounded-lg text-left text-xs transition-colors cursor-pointer ${
                       isSelected
                         ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
                         : 'bg-slate-800/40 text-slate-400 hover:text-white'
@@ -347,25 +347,26 @@ export function SystemModal({ system, isOpen, onClose, onSave }: SystemModalProp
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all disabled:opacity-50"
-            >
-              {loading ? 'Guardando...' : system ? 'Actualizar Sistema' : 'Publicar Sistema'}
-            </button>
-          </div>
-
         </form>
+
+        {/* Fixed Footer (Always visible at the bottom) */}
+        <div className="flex items-center justify-end gap-3 px-6 py-3.5 border-t border-slate-800 shrink-0 bg-slate-900/80">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-colors cursor-pointer"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            form="system-form"
+            disabled={loading}
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/20 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {loading ? 'Guardando...' : system ? 'Actualizar Sistema' : 'Publicar Sistema'}
+          </button>
+        </div>
 
       </div>
     </div>

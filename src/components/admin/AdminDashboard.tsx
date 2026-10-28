@@ -14,69 +14,120 @@ import {
   Eye, 
   ArrowLeft,
   Coins,
-  Settings
+  Settings,
+  UserCheck,
+  Building,
+  Image as ImageIcon,
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
-import { SoftwareSystem, LeadInquiry, AdminMetrics, CurrencyCode } from '@/types';
+import { SoftwareSystem, LeadInquiry, AdminMetrics, CurrencyCode, TeamMember, PlatformSettings } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import { MetricsOverview } from './MetricsOverview';
 import { LeadsManager } from './LeadsManager';
 import { SystemModal } from './SystemModal';
+import { TeamMemberModal } from './TeamMemberModal';
 
 interface AdminDashboardProps {
   admin: { name: string; role: string; email: string };
   systems: SoftwareSystem[];
   leads: LeadInquiry[];
+  team: TeamMember[];
+  settings: PlatformSettings;
   metrics: AdminMetrics;
-  currency: CurrencyCode;
-  onCurrencyChange: (newCurrency: CurrencyCode) => Promise<void>;
   onLogout: () => void;
   onRefreshData: () => void;
   onSaveSystem: (data: Partial<SoftwareSystem>, editingId?: string) => Promise<void>;
   onDeleteSystem: (id: string) => Promise<void>;
   onUpdateLeadStatus: (id: string, status: LeadInquiry['status']) => Promise<void>;
+  onSaveTeamMember: (data: Omit<TeamMember, 'id'>, editingId?: string) => Promise<void>;
+  onDeleteTeamMember: (id: string) => Promise<void>;
+  onSaveSettings: (updates: Partial<PlatformSettings>) => Promise<void>;
 }
 
-type TabType = 'systems' | 'leads' | 'metrics' | 'settings';
+type TabType = 'systems' | 'team' | 'leads' | 'metrics' | 'settings';
 
 export function AdminDashboard({
   admin,
   systems,
   leads,
+  team,
+  settings,
   metrics,
-  currency,
-  onCurrencyChange,
   onLogout,
   onRefreshData,
   onSaveSystem,
   onDeleteSystem,
   onUpdateLeadStatus,
+  onSaveTeamMember,
+  onDeleteTeamMember,
+  onSaveSettings,
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>('systems');
-  const [modalOpen, setModalOpen] = useState(false);
+  
+  // Modals state
+  const [systemModalOpen, setSystemModalOpen] = useState(false);
   const [editingSystem, setEditingSystem] = useState<SoftwareSystem | null>(null);
-  const [savingCurrency, setSavingCurrency] = useState(false);
 
-  const handleOpenCreate = () => {
+  const [teamModalOpen, setTeamModalOpen] = useState(false);
+  const [editingTeamMember, setEditingTeamMember] = useState<TeamMember | null>(null);
+
+  // Brand Settings Form state
+  const [companyName, setCompanyName] = useState(settings.companyName || 'NovaSystems');
+  const [companyTagline, setCompanyTagline] = useState(settings.companyTagline || 'Software Preconstruido');
+  const [logoUrl, setLogoUrl] = useState(settings.logoUrl || '');
+  const [currency, setCurrency] = useState<CurrencyCode>(settings.currency || 'USD');
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsSavedMessage, setSettingsSavedMessage] = useState(false);
+
+  // Handlers for Systems
+  const handleOpenCreateSystem = () => {
     setEditingSystem(null);
-    setModalOpen(true);
+    setSystemModalOpen(true);
   };
 
-  const handleOpenEdit = (sys: SoftwareSystem) => {
+  const handleOpenEditSystem = (sys: SoftwareSystem) => {
     setEditingSystem(sys);
-    setModalOpen(true);
+    setSystemModalOpen(true);
   };
 
-  const handleModalSave = async (data: Partial<SoftwareSystem>) => {
+  const handleSystemModalSave = async (data: Partial<SoftwareSystem>) => {
     await onSaveSystem(data, editingSystem?.id);
-    setModalOpen(false);
+    setSystemModalOpen(false);
   };
 
-  const handleCurrencySelect = async (newCurr: CurrencyCode) => {
-    setSavingCurrency(true);
+  // Handlers for Team Members
+  const handleOpenCreateTeam = () => {
+    setEditingTeamMember(null);
+    setTeamModalOpen(true);
+  };
+
+  const handleOpenEditTeam = (member: TeamMember) => {
+    setEditingTeamMember(member);
+    setTeamModalOpen(true);
+  };
+
+  const handleTeamModalSave = async (data: Omit<TeamMember, 'id'>) => {
+    await onSaveTeamMember(data, editingTeamMember?.id);
+    setTeamModalOpen(false);
+  };
+
+  // Handler for Settings / Branding
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    setSettingsSavedMessage(false);
     try {
-      await onCurrencyChange(newCurr);
+      await onSaveSettings({
+        companyName,
+        companyTagline,
+        logoUrl,
+        currency,
+      });
+      setSettingsSavedMessage(true);
+      setTimeout(() => setSettingsSavedMessage(false), 3000);
     } finally {
-      setSavingCurrency(false);
+      setSavingSettings(false);
     }
   };
 
@@ -98,12 +149,21 @@ export function AdminDashboard({
           <div className="h-4 w-px bg-slate-700 hidden sm:block" />
 
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
-              <Shield className="w-4 h-4" />
-            </div>
+            {settings.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={settings.logoUrl}
+                alt="Logo"
+                className="w-8 h-8 rounded-lg object-contain bg-slate-900 border border-slate-700 p-0.5"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-sky-400">
+                <Shield className="w-4 h-4" />
+              </div>
+            )}
             <div>
               <span className="font-extrabold text-sm text-white">
-                NOVA<span className="text-sky-400">SYSTEMS</span> ADMIN
+                {settings.companyName || 'NOVA'}<span className="text-sky-400"> ADMIN</span>
               </span>
               <span className="text-[10px] text-emerald-400 block font-mono">
                 Sesión 2FA Activa
@@ -112,27 +172,8 @@ export function AdminDashboard({
           </div>
         </div>
 
-        {/* Currency Switcher in Header & Admin Profile */}
+        {/* Quick info & Logout */}
         <div className="flex items-center gap-3">
-          
-          {/* Quick Currency Selector Widget */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-700 text-xs">
-            <Coins className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-slate-400 hidden sm:inline">Moneda Global:</span>
-            <select
-              value={currency}
-              disabled={savingCurrency}
-              onChange={(e) => handleCurrencySelect(e.target.value as CurrencyCode)}
-              className="bg-transparent text-amber-300 font-bold focus:outline-none cursor-pointer"
-            >
-              <option value="USD" className="bg-slate-900 text-white">USD ($ Dólar)</option>
-              <option value="EUR" className="bg-slate-900 text-white">EUR (€ Euro)</option>
-              <option value="MXN" className="bg-slate-900 text-white">MXN ($ Peso Mex)</option>
-              <option value="PEN" className="bg-slate-900 text-white">PEN (S/ Sol Peruano)</option>
-              <option value="COP" className="bg-slate-900 text-white">COP ($ Peso Col)</option>
-            </select>
-          </div>
-
           <div className="text-right hidden md:block">
             <span className="text-xs font-bold text-white block">{admin.name}</span>
             <span className="text-[11px] text-slate-400 block font-mono">{admin.email}</span>
@@ -140,7 +181,7 @@ export function AdminDashboard({
 
           <button
             onClick={onLogout}
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 border border-slate-700 transition-all text-xs flex items-center gap-1.5"
+            className="p-2 rounded-xl bg-slate-800/80 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 border border-slate-700 transition-all text-xs flex items-center gap-1.5 cursor-pointer"
             title="Cerrar sesión"
           >
             <LogOut className="w-4 h-4" />
@@ -156,10 +197,10 @@ export function AdminDashboard({
         {/* Navigation Tabs */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-4">
           
-          <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-2xl border border-slate-800">
+          <div className="flex items-center gap-1.5 bg-slate-900 p-1 rounded-2xl border border-slate-800 flex-wrap">
             <button
               onClick={() => setActiveTab('systems')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'systems'
                   ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-400 hover:text-white'
@@ -170,8 +211,20 @@ export function AdminDashboard({
             </button>
 
             <button
+              onClick={() => setActiveTab('team')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                activeTab === 'team'
+                  ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <UserCheck className="w-4 h-4" />
+              Equipo Dev & QA ({team.length})
+            </button>
+
+            <button
               onClick={() => setActiveTab('leads')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'leads'
                   ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-400 hover:text-white'
@@ -183,36 +236,46 @@ export function AdminDashboard({
 
             <button
               onClick={() => setActiveTab('metrics')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'metrics'
                   ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              Métricas de Clics
+              Métricas
             </button>
 
             <button
               onClick={() => setActiveTab('settings')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'settings'
                   ? 'bg-sky-500 text-white shadow-md shadow-sky-500/20'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
               <Settings className="w-4 h-4" />
-              Configuración & Moneda
+              Logo & Nombre de Empresa
             </button>
           </div>
 
           {activeTab === 'systems' && (
             <button
-              onClick={handleOpenCreate}
+              onClick={handleOpenCreateSystem}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/25 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               Publicar Nuevo Software
+            </button>
+          )}
+
+          {activeTab === 'team' && (
+            <button
+              onClick={handleOpenCreateTeam}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/25 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar Profesional (Dev o QA)
             </button>
           )}
 
@@ -221,7 +284,6 @@ export function AdminDashboard({
         {/* Tab 1: Systems CRUD */}
         {activeTab === 'systems' && (
           <div className="space-y-4">
-            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {systems.map((sys) => (
                 <div
@@ -273,7 +335,7 @@ export function AdminDashboard({
                   {/* Card Actions */}
                   <div className="pt-4 mt-4 border-t border-slate-800 flex items-center justify-between gap-2">
                     <button
-                      onClick={() => handleOpenEdit(sys)}
+                      onClick={() => handleOpenEditSystem(sys)}
                       className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5 text-sky-400" />
@@ -296,11 +358,99 @@ export function AdminDashboard({
                 </div>
               ))}
             </div>
-
           </div>
         )}
 
-        {/* Tab 2: Leads Management */}
+        {/* Tab 2: Team Members CRUD (Rápido para agregar Devs y QAs) */}
+        {activeTab === 'team' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {team.map((member) => {
+                const isDev = member.team === 'dev';
+                return (
+                  <div
+                    key={member.id}
+                    className="rounded-3xl glass-panel-elevated p-5 flex flex-col justify-between border-slate-800 hover:border-sky-500/30 transition-all shadow-xl"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-3">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={member.avatarUrl}
+                            alt={member.name}
+                            className="w-14 h-14 rounded-2xl object-cover border border-slate-700 shrink-0"
+                          />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-base font-bold text-white">{member.name}</h4>
+                              <span
+                                className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                  isDev
+                                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                                    : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                                }`}
+                              >
+                                {isDev ? 'Dev Architecture' : 'QA Lead'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-sky-400 font-medium">{member.role}</p>
+                            <p className="text-[11px] text-slate-400">{member.experienceYears}+ años de experiencia</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
+                        {member.bio}
+                      </p>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 text-[11px] text-emerald-400 mb-3 flex items-center gap-1.5 font-medium">
+                        <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">{member.highlightMetric}</span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {member.specialties.map((spec) => (
+                          <span
+                            key={spec}
+                            className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => handleOpenEditTeam(member)}
+                        className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <Edit3 className="w-3.5 h-3.5 text-sky-400" />
+                        Editar Perfil
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (confirm(`¿Eliminar al profesional "${member.name}"?`)) {
+                            onDeleteTeamMember(member.id);
+                          }
+                        }}
+                        className="p-2 rounded-xl bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                        title="Eliminar profesional"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Leads Management */}
         {activeTab === 'leads' && (
           <LeadsManager
             leads={leads}
@@ -309,76 +459,138 @@ export function AdminDashboard({
           />
         )}
 
-        {/* Tab 3: Metrics & Telemetry */}
+        {/* Tab 4: Metrics */}
         {activeTab === 'metrics' && <MetricsOverview metrics={metrics} />}
 
-        {/* Tab 4: Platform & Currency Settings */}
+        {/* Tab 5: Branding & Company Customization */}
         {activeTab === 'settings' && (
-          <div className="max-w-2xl rounded-3xl glass-panel-elevated p-6 sm:p-8 space-y-6">
+          <div className="max-w-3xl rounded-3xl glass-panel-elevated p-6 sm:p-8 space-y-6">
+            
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Coins className="w-5 h-5 text-amber-400" />
-                Configuración de Moneda y Divisas
+                <Building className="w-5 h-5 text-sky-400" />
+                Personalización de Marca y Nombre de la Empresa
               </h3>
               <p className="text-xs text-slate-400 mt-1">
-                Selecciona la divisa predeterminada en la que los clientes verán los precios de todo el catálogo público.
+                Cambia el nombre comercial, el logotipo y la divisa. Los cambios se actualizarán al instante en la barra de navegación, el footer y toda la tienda.
               </p>
             </div>
 
-            <div className="space-y-4">
-              {[
-                { code: 'USD' as CurrencyCode, name: 'Dólares Americanos (USD $)', desc: 'Moneda de referencia internacional' },
-                { code: 'EUR' as CurrencyCode, name: 'Euros (EUR €)', desc: 'Para clientes de España y Unión Europea' },
-                { code: 'MXN' as CurrencyCode, name: 'Pesos Mexicanos (MXN $)', desc: 'Tipo de cambio estimado 1 USD ≈ 18.50 MXN' },
-                { code: 'PEN' as CurrencyCode, name: 'Soles Peruanos (PEN S/)', desc: 'Tipo de cambio estimado 1 USD ≈ 3.75 PEN' },
-                { code: 'COP' as CurrencyCode, name: 'Pesos Colombianos (COP $)', desc: 'Tipo de cambio estimado 1 USD ≈ 4,100 COP' },
-              ].map((item) => {
-                const isSelected = currency === item.code;
-                return (
-                  <button
-                    key={item.code}
-                    onClick={() => handleCurrencySelect(item.code)}
-                    disabled={savingCurrency}
-                    className={`w-full p-4 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
-                      isSelected
-                        ? 'bg-amber-500/10 border-amber-500/50 text-white'
-                        : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:border-slate-700'
-                    }`}
-                  >
-                    <div>
-                      <div className="font-bold text-sm text-white flex items-center gap-2">
-                        <span>{item.name}</span>
-                        {isSelected && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                            Activa en la Plataforma
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5">{item.desc}</p>
-                    </div>
+            {settingsSavedMessage && (
+              <div className="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>¡Cambios de marca y moneda guardados correctamente!</span>
+              </div>
+            )}
 
-                    <div
-                      className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ${
-                        isSelected ? 'border-amber-400 bg-amber-500 text-slate-950 font-black text-xs' : 'border-slate-700'
-                      }`}
-                    >
-                      {isSelected && '✓'}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            <form onSubmit={handleSettingsSubmit} className="space-y-5">
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Nombre de la Empresa / Marca *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="Ej: NovaSystems o MiEmpresa Software"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Eslogan / Subtítulo Corto
+                  </label>
+                  <input
+                    type="text"
+                    value={companyTagline}
+                    onChange={(e) => setCompanyTagline(e.target.value)}
+                    placeholder="Ej: Software Preconstruido & Llave en Mano"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Logo URL & Live Preview */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  URL del Logotipo (Imagen PNG / SVG / WebP)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-700 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+                    {logoUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={logoUrl} alt="Logo Preview" className="max-w-full max-h-full object-contain" />
+                    ) : (
+                      <ImageIcon className="w-6 h-6 text-slate-500" />
+                    )}
+                  </div>
+                  <input
+                    type="url"
+                    value={logoUrl}
+                    onChange={(e) => setLogoUrl(e.target.value)}
+                    placeholder="https://ejemplo.com/mi-logo.png (deja vacío para usar icono corporativo)"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">
+                  * Si dejas este campo vacío, la plataforma usará automáticamente el icono de escudo corporativo.
+                </p>
+              </div>
+
+              {/* Currency Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <Coins className="w-4 h-4 text-amber-400" />
+                  Divisa Principal de la Tienda
+                </label>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value as CurrencyCode)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none cursor-pointer"
+                >
+                  <option value="USD">USD ($ Dólar Americano - Internacional)</option>
+                  <option value="EUR">EUR (€ Euro - España y Unión Europea)</option>
+                  <option value="MXN">MXN ($ Peso Mexicano)</option>
+                  <option value="PEN">PEN (S/ Sol Peruano)</option>
+                  <option value="COP">COP ($ Peso Colombiano)</option>
+                </select>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={savingSettings}
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-sky-500/25 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  {savingSettings ? 'Guardando...' : 'Guardar Cambios de Marca y Configuración'}
+                </button>
+              </div>
+
+            </form>
+
           </div>
         )}
 
       </main>
 
-      {/* CRUD Modal */}
+      {/* Systems CRUD Modal */}
       <SystemModal
         system={editingSystem}
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSave={handleModalSave}
+        isOpen={systemModalOpen}
+        onClose={() => setSystemModalOpen(false)}
+        onSave={handleSystemModalSave}
+      />
+
+      {/* Team Member CRUD Modal */}
+      <TeamMemberModal
+        member={editingTeamMember}
+        isOpen={teamModalOpen}
+        onClose={() => setTeamModalOpen(false)}
+        onSave={handleTeamModalSave}
       />
 
     </div>

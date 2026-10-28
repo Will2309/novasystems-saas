@@ -2,69 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Code2, 
-  ShieldCheck, 
-  Cpu, 
   FileCheck, 
   Lock, 
   Gauge, 
   Workflow, 
-  Sparkles,
-  Award,
-  Terminal,
-  TrendingUp,
-  UserCheck
+  Sparkles, 
+  Award, 
+  TrendingUp, 
+  UserCheck 
 } from 'lucide-react';
 import { TeamMember } from '@/types';
+import { INITIAL_TEAM_MEMBERS } from '@/services/teamService';
 
-const TEAM_MEMBERS: TeamMember[] = [
-  // Dev Team
-  {
-    id: 'dev-1',
-    name: 'Ing. Mateo Rossi',
-    role: 'Principal Software Architect & Tech Lead',
-    team: 'dev',
-    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-    bio: 'Especialista en Clean Architecture, DDD y optimización de microservicios. Más de una década diseñando plataformas transaccionales.',
-    specialties: ['Next.js 14/15', 'NestJS', 'PostgreSQL RLS', 'Docker'],
-    experienceYears: 12,
-    highlightMetric: '99.98% uptime en arquitecturas desplegadas',
-  },
-  {
-    id: 'dev-2',
-    name: 'Ing. Carlos Varela',
-    role: 'Senior Cloud & Backend Engineer',
-    team: 'dev',
-    avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-    bio: 'Experto en escalabilidad de bases de datos, APIs de facturación electrónica y contenedorización para despliegues llave en mano.',
-    specialties: ['Go (Golang)', 'Laravel', 'Redis Cache', 'Kubernetes'],
-    experienceYears: 8,
-    highlightMetric: 'Menos de 30ms en procesamiento de transacciones',
-  },
-  // QA Team
-  {
-    id: 'qa-1',
-    name: 'Lic. David Benítez',
-    role: 'Lead QA Automation Engineer',
-    team: 'qa',
-    avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-    bio: 'Diseñador de pipelines de pruebas continuas. Garantiza la cobertura integral de flujos críticos de ventas, inventario y consultas médicas.',
-    specialties: ['Playwright', 'Vitest', 'Cypress', 'k6 Stress Testing'],
-    experienceYears: 9,
-    highlightMetric: '+1,800 casos de prueba automatizados',
-  },
-  {
-    id: 'qa-2',
-    name: 'Ing. Elena Morales',
-    role: 'Security & AppSec Vulnerability Auditor',
-    team: 'qa',
-    avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-    bio: 'Auditora de ciberseguridad especializada en hardening de aplicaciones web, sanitización de datos y cumplimiento OWASP Top 10.',
-    specialties: ['OWASP Top 10', 'SAST / DAST', 'Argon2id / 2FA', 'Penetration Testing'],
-    experienceYears: 7,
-    highlightMetric: '0 vulnerabilidades críticas en producción',
-  },
-];
+interface DevQaSectionProps {
+  team?: TeamMember[];
+}
 
 interface MetricCardProps {
   label: string;
@@ -97,7 +49,6 @@ function DynamicHoverMetric({
     const step = (timestamp: number) => {
       if (!startTimestamp) startTimestamp = timestamp;
       const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      // Ease out cubic
       const easeProgress = 1 - Math.pow(1 - progress, 3);
       const nextVal = startVal + (endVal - startVal) * easeProgress;
       setCurrentValue(Number(nextVal.toFixed(1)));
@@ -118,7 +69,7 @@ function DynamicHoverMetric({
         setCurrentValue(0);
       }}
       onMouseLeave={() => setIsHovered(false)}
-      className="p-5 sm:p-6 rounded-2xl glass-panel-elevated border border-slate-800 hover:border-sky-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden"
+      className="p-5 sm:p-6 rounded-2xl glass-panel-elevated border border-slate-800 hover:border-sky-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden shadow-lg"
     >
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-semibold text-slate-400 group-hover:text-slate-200 transition-colors">
@@ -152,16 +103,18 @@ function DynamicHoverMetric({
       {/* Hover visual cue */}
       <div className="mt-2 text-[10px] font-mono text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
         <TrendingUp className="w-3 h-3" />
-        <span>Pasa el cursor para ver la animación en vivo</span>
+        <span>Pasa el cursor para ver la animación</span>
       </div>
     </div>
   );
 }
 
-export function DevQaSection() {
+export function DevQaSection({ team = INITIAL_TEAM_MEMBERS }: DevQaSectionProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'dev' | 'qa'>('all');
 
-  const filteredMembers = TEAM_MEMBERS.filter(
+  const membersList = team && team.length > 0 ? team : INITIAL_TEAM_MEMBERS;
+
+  const filteredMembers = membersList.filter(
     (m) => activeTab === 'all' || m.team === activeTab
   );
 
@@ -230,17 +183,17 @@ export function DevQaSection() {
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800">
             <button
               onClick={() => setActiveTab('all')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'all'
                   ? 'bg-sky-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Todos ({TEAM_MEMBERS.length})
+              Todos ({membersList.length})
             </button>
             <button
               onClick={() => setActiveTab('dev')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'dev'
                   ? 'bg-sky-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
@@ -250,7 +203,7 @@ export function DevQaSection() {
             </button>
             <button
               onClick={() => setActiveTab('qa')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'qa'
                   ? 'bg-sky-500 text-white shadow-sm'
                   : 'text-slate-400 hover:text-white'
@@ -261,7 +214,7 @@ export function DevQaSection() {
           </div>
         </div>
 
-        {/* 3. Team Profiles Cards Grid */}
+        {/* 3. Team Profiles Cards Grid (Dynamic from Admin CRUD) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-14">
           {filteredMembers.map((member) => {
             const isDev = member.team === 'dev';
@@ -277,7 +230,7 @@ export function DevQaSection() {
                     <img
                       src={member.avatarUrl}
                       alt={member.name}
-                      className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-700 shadow-md"
+                      className="w-16 h-16 rounded-2xl object-cover border-2 border-slate-700 shadow-md shrink-0"
                     />
                     <div>
                       <div className="flex items-center gap-2">

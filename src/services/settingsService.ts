@@ -2,6 +2,9 @@ import { PlatformSettings, CurrencyCode } from '@/types';
 
 let currentSettings: PlatformSettings = {
   currency: 'USD',
+  companyName: 'NovaSystems',
+  companyTagline: 'Software Preconstruido',
+  logoUrl: '',
   updatedAt: new Date().toISOString(),
 };
 
@@ -10,12 +13,16 @@ export const SettingsService = {
     return { ...currentSettings };
   },
 
-  async updateCurrency(currency: CurrencyCode): Promise<PlatformSettings> {
+  async updateSettings(updates: Partial<PlatformSettings>): Promise<PlatformSettings> {
     currentSettings = {
       ...currentSettings,
-      currency,
+      ...updates,
       updatedAt: new Date().toISOString(),
     };
     return { ...currentSettings };
+  },
+
+  async updateCurrency(currency: CurrencyCode): Promise<PlatformSettings> {
+    return this.updateSettings({ currency });
   },
 };
