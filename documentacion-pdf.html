@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>NovaSystems Enterprise SaaS Marketplace - Dossier Técnico</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 15mm 15mm 18mm 15mm;
+      @bottom-right {
+        content: counter(page);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.55;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+    }
+    .header-banner {
+      background: linear-gradient(135deg, #070d17 0%, #0c1b33 100%);
+      color: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border-left: 6px solid #38bdf8;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 7.5pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    h1 {
+      font-size: 20pt;
+      margin: 4px 0 8px 0;
+      color: #ffffff;
+      font-weight: 800;
+    }
+    .subtitle {
+      font-size: 11pt;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 8.5pt;
+    }
+    .meta-item strong {
+      display: block;
+      color: #cbd5e1;
+      font-size: 8pt;
+      text-transform: uppercase;
+    }
+    .meta-item span {
+      color: #38bdf8;
+    }
+    h2 {
+      font-size: 13pt;
+      color: #0f172a;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      page-break-after: avoid;
+    }
+    h3 {
+      font-size: 11pt;
+      color: #0369a1;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      page-break-after: avoid;
+    }
+    p {
+      margin: 0 0 10px 0;
+      color: #334155;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 8.5pt;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 7px 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      letter-spacing: 0.04em;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    code, pre {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 8.5pt;
+    }
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      page-break-inside: avoid;
+      border-left: 4px solid #38bdf8;
+    }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      page-break-inside: avoid;
+    }
+    .card-title {
+      font-weight: bold;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .highlight-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #10b981;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin: 12px 0;
+      font-size: 9pt;
+      color: #14532d;
+      page-break-inside: avoid;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    ul, ol {
+      margin: 0 0 10px 0;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cover / Header Banner -->
+  <div class="header-banner">
+    <div class="badge">DOCUMENTO DE ARQUITECTURA & GUÍA OPERATIVA</div>
+    <h1>NovaSystems Enterprise SaaS Marketplace</h1>
+    <p class="subtitle">Plataforma Corporativa de Comercialización de Software Preconstruido</p>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <strong>Rol del Sistema:</strong>
+        <span>Arquitecto Senior & UX/UI</span>
+      </div>
+      <div class="meta-item">
+        <strong>Directorio del Proyecto:</strong>
+        <span>novasystems-saas</span>
+      </div>
+      <div class="meta-item">
+        <strong>Entorno & Versión:</strong>
+        <span>Next.js 16 + React 19 + TypeScript</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>1. Visión General y Propósito del Sistema</h2>
+  <p>
+    <strong>NovaSystems</strong> es una plataforma de comercio y licenciamiento de software B2B de alta conversión. Su meta es comercializar sistemas preconstruidos probados (Puntos de Venta, Clínicas, Ferreterías, Facturación Electrónica, ERP Retail y Colegios) permitiendo a los clientes interactuar con demos seguras en vivo y solicitar cotizaciones llave en mano con entrega de código fuente transferible.
+  </p>
+
+  <div class="highlight-box">
+    <strong>Garantía de Confianza Corporativa:</strong> La plataforma elimina la incertidumbre técnica mediante pruebas de software automatizadas (>90%), soporte de despliegue en contenedores Docker y 12 meses de garantía contractual sobre la arquitectura.
+  </div>
+
+  <h2>2. Matriz de Hardening de Seguridad (OWASP Top 10)</h2>
+  <p>La seguridad y resiliencia han sido integradas en todas las capas del sistema:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Vector de Seguridad</th>
+        <th>Mecanismo Implementado</th>
+        <th>Archivo de Referencia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Autenticación en Dos Pasos (2FA)</strong></td>
+        <td>Panel de administración protegido con contraseña + código TOTP dinámico de 6 dígitos.</td>
+        <td><code>src/components/admin/AdminLogin.tsx</code></td>
+      </tr>
+      <tr>
+        <td><strong>Prevención DDoS y Fuerza Bruta</strong></td>
+        <td>Rate Limiting <em>Sliding Window</em> (máx. 5 intentos de login y 5 envíos de contacto).</td>
+        <td><code>src/lib/rate-limit.ts</code></td>
+      </tr>
+      <tr>
+        <td><strong>Sanitización XSS y Script Injection</strong></td>
+        <td>Limpieza profunda que purga etiquetas HTML, atributos <code>on*</code> y scripts maliciosos.</td>
+        <td><code>src/lib/sanitize.ts</code></td>
+      </tr>
+      <tr>
+        <td><strong>Clickjacking</strong></td>
+        <td>Cabecera HTTP <code>X-Frame-Options: SAMEORIGIN</code>.</td>
+        <td><code>next.config.ts</code></td>
+      </tr>
+      <tr>
+        <td><strong>MIME-Sniffing</strong></td>
+        <td>Cabecera HTTP <code>X-Content-Type-Options: nosniff</code>.</td>
+        <td><code>next.config.ts</code></td>
+      </tr>
+      <tr>
+        <td><strong>Seguridad de Transporte</strong></td>
+        <td>HSTS (<code>Strict-Transport-Security: max-age=63072000; preload</code>).</td>
+        <td><code>next.config.ts</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Estructura de la Landing Page & Conversión UX/UI</h2>
+  <ul>
+    <li><strong>Hero Section:</strong> Titular corporativo de alto impacto, contadores de confianza (+150 demos activas, 99.98% SLA, 450+ clientes) y barra de búsqueda reactiva por palabras clave y categorías.</li>
+    <li><strong>Catálogo Dinámico de Sistemas:</strong> Tarjetas detalladas con público objetivo, badges tecnológicos (Node.js, React, Laravel, Flutter, PostgreSQL, Docker), módulos clave incluidos, inversión base y contador de pruebas en vivo.</li>
+    <li><strong>Visor de Demos Interactivas (Modal Sandbox):</strong>
+      <ul>
+        <li>Selector responsivo: Escritorio, Tablet y Móvil.</li>
+        <li>Simulador POS funcional: Agregar productos al carrito, cálculo de IVA y emisión instantánea de ticket fiscal con firma XML simulada.</li>
+        <li>Simulador Clínico: Expediente clínico electrónico (EHR), signos vitales y recetas digitales con código QR verificable.</li>
+        <li>Copiado de credenciales simuladas en 1 clic.</li>
+      </ul>
+    </li>
+    <li><strong>Equipo Dual Dev + QA:</strong> Misión corporativa que expone las fortalezas de los Desarrolladores (Clean Architecture, DDD, Docker) y Aseguramiento de Calidad (pruebas k6, Vitest, Playwright y SAST OWASP).</li>
+    <li><strong>Contacto & WhatsApp Inteligente:</strong> Formulario de cotización sanitizado con enlace automático a WhatsApp Business prellenado con el nombre del sistema seleccionado.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h2>4. Panel de Administración No-Code (/admin)</h2>
+  <div class="card">
+    <div class="card-title">Credenciales de Acceso al Panel de Demostración:</div>
+    <ul>
+      <li><strong>Ruta:</strong> <code>http://localhost:3000/admin</code></li>
+      <li><strong>Usuario:</strong> <code>admin@novasystems.io</code></li>
+      <li><strong>Contraseña:</strong> <code>NovaEnterprise2026!</code></li>
+      <li><strong>Código 2FA / TOTP:</strong> <code>123456</code> o <code>849201</code></li>
+    </ul>
+  </div>
+
+  <p><strong>Módulos del Panel de Administración:</strong></p>
+  <ol>
+    <li><strong>Gestión de Sistemas (CRUD Completo):</strong> Formulario intuitivo para publicar nuevos sistemas o editar existentes (título, categoría, precio, licencia, tags de tecnología y módulos) sin escribir código.</li>
+    <li><strong>Gestión de Leads / Cotizaciones:</strong> Tabla en vivo de clientes potenciales con cambio de estado (<em>Nuevo</em>, <em>Contactado</em>, <em>Cotización Enviada</em>, <em>Cerrado</em>) y botón de contacto inmediato a su WhatsApp.</li>
+    <li><strong>Telemetría y Analítica de Clics:</strong> Gráficos y ranking de sistemas con mayor número de clics en "Ver Demo" para conocer la demanda del mercado en tiempo real.</li>
+  </ol>
+
+  <h2>5. Guía para Abrir, Ver y Ejecutar el Código</h2>
+
+  <h3>Opción A: Abrir en el Explorador de Archivos de Windows</h3>
+  <p>Para ver todos los archivos en tu carpeta de Windows, abre PowerShell o CMD y ejecuta:</p>
+  <pre>explorer "C:\Users\Will\.gemini\antigravity\scratch\novasystems-saas"</pre>
+
+  <h3>Opción B: Abrir en Visual Studio Code o Cursor</h3>
+  <p>Para editar y explorar los componentes y rutas del proyecto en tu editor preferido:</p>
+  <pre>cd "C:\Users\Will\.gemini\antigravity\scratch\novasystems-saas"
+code .</pre>
+
+  <h3>Opción C: Poner en Marcha el Servidor de Desarrollo</h3>
+  <p>Para interactuar con la plataforma y el panel de administración en tu navegador web:</p>
+  <pre>cd "C:\Users\Will\.gemini\antigravity\scratch\novasystems-saas"
+npm run dev</pre>
+  <p>Luego abre tu navegador en:</p>
+  <ul>
+    <li><strong>Tienda y Catálogo Público:</strong> <code>http://localhost:3000</code></li>
+    <li><strong>Panel de Administración Seguro:</strong> <code>http://localhost:3000/admin</code></li>
+  </ul>
+
+  <h2>6. Mapa de Archivos del Proyecto</h2>
+  <pre>
+novasystems-saas/
+├── src/
+│   ├── app/
+│   │   ├── admin/page.tsx          <-- Página del Dashboard Admin con 2FA
+│   │   ├── api/                    <-- Endpoints RESTful Seguros
+│   │   │   ├── auth/               <-- Login y verificación TOTP
+│   │   │   ├── demos/track/        <-- Contador telemétrico de clics
+│   │   │   ├── leads/              <-- Captura y gestión de prospectos
+│   │   │   └── systems/            <-- CRUD de sistemas
+│   │   ├── globals.css             <-- Estilos globales Dark Navy corporativos
+│   │   ├── layout.tsx              <-- Configuración SEO y metadatos
+│   │   └── page.tsx                <-- Landing Page Principal
+│   ├── components/
+│   │   ├── admin/                  <-- Modales, Tablas de Leads y Métricas
+│   │   └── landing/                <-- Hero, Catálogo, Modal Demo y Contacto
+│   ├── lib/
+│   │   ├── mock-data.ts            <-- Datos enriquecidos de demostración
+│   │   ├── rate-limit.ts           <-- Rate Limiter Sliding Window
+│   │   ├── sanitize.ts             <-- Sanitizador contra XSS
+│   │   └── utils.ts                <-- Utilidades y generador WhatsApp
+│   ├── services/
+│   │   ├── leadsService.ts         <-- Capa de persistencia de prospectos
+│   │   └── systemsService.ts       <-- Capa de persistencia de sistemas
+│   └── types/
+│       └── index.ts                <-- Tipado estricto TypeScript
+├── next.config.ts                  <-- Cabeceras de seguridad HTTP
+├── package.json                    <-- Dependencias y scripts de ejecución
+└── README.md                       <-- Documentación y especificaciones
+  </pre>
+
+  <p style="text-align: center; color: #64748b; font-size: 8pt; margin-top: 30px;">
+    © 2026 NovaSystems Enterprise Inc. — Dossier Técnico Generado por Antigravity AI.
+  </p>
+
+</body>
+</html>
