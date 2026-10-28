@@ -8,11 +8,12 @@ Esta guía detalla los pasos exactos para llevar la plataforma **NovaSystems Pro
 
 1. [¿Cómo funciona el sistema de Correo y OTP?](#1-cómo-funciona-el-sistema-de-correo-y-otp)
 2. [Paso a Paso: Configurar Correo Real con Resend (Gratis)](#2-paso-a-paso-configurar-correo-real-con-resend-gratis)
-3. [Configuración de Variables de Entorno (.env)](#3-configuración-de-variables-de-entorno-env)
-4. [Opción A: Despliegue en Vercel (Recomendado - 1 Clic)](#4-opción-a-despliegue-en-vercel-recomendado---1-clic)
-5. [Opción B: Despliegue en VPS Linux (Ubuntu con Docker / PM2 + Nginx SSL)](#5-opción-b-despliegue-en-vps-linux-ubuntu-con-docker--pm2--nginx-ssl)
-6. [Configuración de Dominio y Cloudflare WAF](#6-configuración-de-dominio-y-cloudflare-waf)
-7. [Migración de Base de Datos (PostgreSQL / Supabase)](#7-migración-de-base-de-datos-postgresql--supabase)
+3. [Gestión Multiusuario y Roles Administrativos](#3-gestión-multiusuario-y-roles-administrativos)
+4. [Configuración de Variables de Entorno (.env)](#4-configuración-de-variables-de-entorno-env)
+5. [Opción A: Despliegue en Vercel (Recomendado - 1 Clic)](#5-opción-a-despliegue-en-vercel-recomendado---1-clic)
+6. [Opción B: Despliegue en VPS Linux (Ubuntu con Docker / PM2 + Nginx SSL)](#6-opción-b-despliegue-en-vps-linux-ubuntu-con-docker--pm2--nginx-ssl)
+7. [Configuración de Dominio y Cloudflare WAF](#7-configuración-de-dominio-y-cloudflare-waf)
+8. [Migración de Base de Datos (PostgreSQL / Supabase)](#8-migración-de-base-de-datos-postgresql--supabase)
 
 ---
 
@@ -59,7 +60,21 @@ Hemos integrado **Resend** como proveedor oficial porque es el estándar moderno
 
 ---
 
-## 3. Configuración de Variables de Entorno (.env)
+## 3. Gestión Multiusuario y Roles Administrativos
+
+El sistema cuenta con soporte para múltiples administradores con entrega individual de códigos 2FA/OTP:
+
+- **SuperAdmin Propietario (`willja960@gmail.com`)**: Control total del catálogo, finanzas, métricas y gestión de accesos.
+- **Nuevos Administradores**:
+  1. Entra a `/admin` con tu correo.
+  2. Ve a la pestaña **"Usuarios & Accesos"**.
+  3. Haz clic en **"+ Agregar Nuevo Administrador"**.
+  4. Ingresa el nombre, correo real y rol (*SuperAdmin*, *Admin*, *Ventas* o *Soporte*).
+  5. Cada usuario que agregues recibirá su código OTP exclusivo en su propia bandeja de correo al iniciar sesión.
+
+---
+
+## 4. Configuración de Variables de Entorno (.env)
 
 Crea un archivo llamado `.env.local` (o agrégalas en el panel de tu hosting):
 
